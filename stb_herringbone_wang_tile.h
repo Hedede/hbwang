@@ -314,6 +314,7 @@ STBHW_EXTERN int stbhw_make_template(stbhw_config *c, unsigned char *data, int w
 //                       IMPLEMENTATION SECTION                             //
 //                                                                          //
 
+#define STB_HERRINGBONE_WANG_TILE_IMPLEMENTATION
 #ifdef STB_HERRINGBONE_WANG_TILE_IMPLEMENTATION
 
 
