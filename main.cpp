@@ -34,7 +34,6 @@ void genwang(std::string filename, unsigned char* data, int xs, int ys, int w, i
     // allocate a buffer to create the final image to
     int yimg = ys + 4;
     auto buff = static_cast<unsigned char*>(malloc(3 * xs * yimg));
-    srand(time(NULL));
     stbhw_generate_image(&ts, NULL, buff, xs * 3, xs, yimg);
     stbi_write_png(filename.c_str(), xs, yimg, 3, buff, xs * 3);
     stbhw_free_tileset(&ts);
