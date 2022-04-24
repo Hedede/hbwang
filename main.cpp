@@ -47,7 +47,7 @@ int main(int argc, char** argv)
                         "generates file named 'test_map.png'\n");
         exit(1);
     }
-    int xs, ys, w, h;
+    int w, h;
 
     unsigned char* data = stbi_load(argv[1], &w, &h, NULL, 3);
 
@@ -57,23 +57,32 @@ int main(int argc, char** argv)
         exit(1);
     }
 
-    xs = atoi(argv[2]);
-    ys = atoi(argv[3]);
+    int xs = atoi(argv[2]);
+    int ys = atoi(argv[3]);
+    printf("Tileset: %s\n", argv[1]);
+    printf("Output size: %dx%d\n", xs, ys);
 
     auto seed = atoi(argv[4]);
     printf("Using seed: %d\n", seed);
     wang_seed = seed;
-    for (int i = 0; i < 1; ++i) {
-        random.SetSeed(wang_seed);
+    {
+        CLGMRandom rnd(seed);
 
-        for (int j = 0; j < i; ++j) {
-            STB_HBWANG_RAND();
+        // int num = seed + x - 11 * (x / 11) - 12 * (seed / 12);
+        int num = xs % 11 + seed % 12;
+        printf("Some number: %d\n", num);
+        while (num-- > 0) {
+            rnd.Next();
         }
+
+        double newSeed = rnd.Next() * 2147483645.0;
+        printf("Adjusted seed: %d\n", int(newSeed));
 
         auto filename = std::string(argv[1]);
         filename = filename.substr(0, filename.size() - 4);
-        filename = filename + std::to_string(seed) + "." + std::to_string(i) + ".png";
+        filename = filename + std::to_string(seed) + ".png";
 
+        random.SetSeed(newSeed);
         genwang(filename, data, xs, ys, w, h);
     }
 
