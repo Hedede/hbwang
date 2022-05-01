@@ -8,6 +8,14 @@
 //
 #include "random.h"
 
+double wang_seed = 0;
+static CLGMRandom random(wang_seed);
+
+int myrand()
+{
+    return random.Random(0, 2147483645 - 1);
+}
+
 #define STB_HBWANG_RAND() myrand()
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -42,11 +50,18 @@ void genwang(std::string filename, unsigned char* data, int xs, int ys, int w, i
 
 int main(int argc, char** argv)
 {
-    if (argc != 5) {
-        fprintf(stderr, "Usage: mapgen {tile-file} {xsize} {ysize} {seed}\n"
+    if (argc < 5) {
+        fprintf(stderr, "Usage: mapgen {tile-file} {xsize} {ysize} {seed} [n]\n"
                         "generates file named 'test_map.png'\n");
         exit(1);
     }
+    int xs = atoi(argv[2]);
+    int ys = atoi(argv[3]);
+
+    int n = 1;
+    if (argc >= 6)
+        n = atoi(argv[5]);
+
     int w, h;
 
     unsigned char* data = stbi_load(argv[1], &w, &h, NULL, 3);
@@ -57,33 +72,33 @@ int main(int argc, char** argv)
         exit(1);
     }
 
-    int xs = atoi(argv[2]);
-    int ys = atoi(argv[3]);
     printf("Tileset: %s\n", argv[1]);
     printf("Output size: %dx%d\n", xs, ys);
 
-    auto seed = atoi(argv[4]);
-    printf("Using seed: %d\n", seed);
+    auto seed = std::stoull(argv[4]);
+    printf("Using seed: %llu\n", seed);
     wang_seed = seed;
     {
         CLGMRandom rnd(seed);
 
-        // int num = seed + x - 11 * (x / 11) - 12 * (seed / 12);
+        // int num = seed + xs + 11 * (xs / -11) - 12 * (seed / 12);
         int num = xs % 11 + seed % 12;
         printf("Some number: %d\n", num);
         while (num-- > 0) {
             rnd.Next();
         }
 
-        double newSeed = rnd.Next() * 2147483645.0;
-        printf("Adjusted seed: %d\n", int(newSeed));
+        for (int i = 0; i < n; ++i) {
+            double newSeed = rnd.Next() * 2147483645.0;
+            printf("Adjusted seed: %f\n", newSeed);
+            random.SetSeed(newSeed);
 
-        auto filename = std::string(argv[1]);
-        filename = filename.substr(0, filename.size() - 4);
-        filename = filename + std::to_string(seed) + ".png";
+            auto filename = std::string(argv[1]);
+            filename = filename.substr(0, filename.size() - 4);
+            filename = filename + std::to_string(seed) + "#" + std::to_string(i) + ".png";
 
-        random.SetSeed(newSeed);
-        genwang(filename, data, xs, ys, w, h);
+            genwang(filename, data, xs, ys, w, h);
+        }
     }
 
     free(data);

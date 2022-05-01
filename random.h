@@ -62,11 +62,3 @@ inline double CLGMRandom::Next()
     seed = (double)iseed;
     return seed * 4.656612875e-10;
 }
-
-double wang_seed = 0;
-static CLGMRandom random(wang_seed);
-
-unsigned int myrand()
-{
-    return random.Random(0, 2147483645 - 1);
-}
