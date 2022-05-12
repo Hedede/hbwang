@@ -5,8 +5,7 @@
 #include <iostream>
 #include <string>
 
-//
-#include "random.h"
+#include "ProceduralRandom.h"
 
 double wang_seed = 0;
 static CLGMRandom random(wang_seed);
@@ -50,6 +49,8 @@ void genwang(std::string filename, unsigned char* data, int xs, int ys, int w, i
 
 int main(int argc, char** argv)
 {
+    test_proc_random();
+    return 0;
     if (argc < 5) {
         fprintf(stderr, "Usage: mapgen {tile-file} {xsize} {ysize} {seed} [n]\n"
                         "generates file named 'test_map.png'\n");
